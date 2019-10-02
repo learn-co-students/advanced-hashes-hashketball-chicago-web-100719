@@ -155,7 +155,7 @@ hash = game_hash
   hash.each do |location, attributes|
     if hash[location].values.include?(team_name)
       attributes.each do |attribute, info|
-        if info.class == Hash
+        if attribute == :players 
           info.each do |player, stats|
             stats.each do |stat, int|
               if stat == :number
@@ -186,7 +186,7 @@ def big_shoe_rebounds
   shoe_size = 0
   hash.each do |location, attributes|
     attributes.each do |attribute, info|
-      if info.class == Hash
+      if attribute == :players 
         info.each do |player, stats|
             stats.each do |stat, int|
               if stat == :shoe
@@ -203,20 +203,59 @@ def big_shoe_rebounds
   end
 end
 
+def player_with_most(statistic)
+    player_name = nil
+  amount_of_stat = 0
+
+  game_hash.each do |_team, game_data|
+    game_data[:players].each do |player, stats|
+      if stats[statistic] > amount_of_stat
+        amount_of_stat = stats[statistic]
+        player_name = player
+      end
+    end
+  end
+  player_name
+end
+
 def most_points_scored
-  return "Ben Gordon"
+  player_with_most(:points)
 end
 
 def winning_team 
-  return "Brooklyn Nets"
+  nets = 0 
+  hornets = 0 
+  
+  game_hash[:home][:players].each do |player, stat|
+    nets += stat[:points]
+  end
+  game_hash[:away][:players].each do |player, stat|
+    hornets += stat[:points]
+  end
+  if nets > hornets
+    return "Brooklyn Nets"
+  else
+    return "Charlotte Hornets"
+  end
 end
 
 def player_with_longest_name 
-  return "Bismack Biyombo"
+  the_name = ""
+  name_length = 0 
+  
+  game_hash.each do |location, attributes|
+    game_hash[location][:players].each do |player, stats|
+      if player.length > name_length
+        name_length = player.length 
+        the_name = player 
+      end
+    end
+  end
+  return the_name
 end
 
 def long_name_steals_a_ton?
-  return true 
+  player_with_longest_name == player_with_most(:steals) 
 end
               
 
